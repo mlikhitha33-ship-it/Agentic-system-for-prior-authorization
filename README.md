@@ -1,7 +1,5 @@
 # Agentic-system-for-prior-authorization
 
-# Prior-Authorization Review Automation
-
 An agentic system that automates the first-pass review a payer's clinical
 staff performs manually: given a clinical note and a requested medical
 service, it extracts the relevant clinical facts, retrieves the applicable
