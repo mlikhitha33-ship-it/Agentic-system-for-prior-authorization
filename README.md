@@ -21,38 +21,8 @@ real CMS Local Coverage Determination for lumbar MRI (L34220).
 
 ## Architecture
 
-```
-Requested service + clinical note
-        |
-        v
-[1] Structured Fact Extraction (OpenAI)
-    -> age, symptom duration, conservative treatment (bool),
-       neurological deficit (bool), red flags (bool), etc.
-        |
-        v
-[2] Policy Retrieval (LangChain + Pinecone)
-    -> relevant LCD clause(s), with section/paragraph reference
-        |
-        v
-[3] Rule-Based Criteria Match
-    -> checklist of which required criteria are met / unmet / undetermined
-        |
-        v
-[4] LLM Judgment (only for cases the rule engine can't resolve cleanly)
-        |
-        v
-[5] Decision
-    -> Approve / Deny / Insufficient Information
-    -> rule-match ratio as the primary confidence signal (e.g. "6/6 matched")
-    -> counterfactual for Deny/Insufficient cases, grounded only in the
-       retrieved policy text
-        |
-        v
-[6] Audit Trail Output
-    -> full reasoning chain rendered top to bottom: facts extracted ->
-       policy retrieved -> rules matched/unmatched -> decision ->
-       evidence citation -> reviewer accept/override
-```
+![Architecture diagram](docs/architecture.png)
+
 
 ## Technologies
 
