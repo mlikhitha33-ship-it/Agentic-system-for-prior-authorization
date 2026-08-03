@@ -1,11 +1,17 @@
-# Agentic-system-for-prior-authorization
+# Agentic System for Medicare Coverage Eligibility Review
 
-An agentic system that automates the first-pass review a payer's clinical
-staff performs manually: given a clinical note and a requested medical
-service, it extracts the relevant clinical facts, retrieves the applicable
-coverage policy, checks documented criteria against that policy, and returns
-a decision recommendation — Approve, Deny, or Insufficient Information —
-with a citation back to the specific policy clause that justifies it.
+Healthcare reviewers spend significant time manually determining whether a patient's clinical documentation satisfies Medicare coverage requirements for a requested medical service. Although CMS publishes Local Coverage Determinations (LCDs) through the Medicare Coverage Database, reviewers must still read lengthy clinical notes, identify relevant clinical facts, compare them against policy criteria, and document the rationale for their decision.
+
+This project automates that first-pass coverage eligibility review using an agentic Retrieval-Augmented Generation (RAG) workflow. Given a clinical note and a requested procedure (starting with Lumbar MRI), the system:
+
+* Extracts structured clinical facts from unstructured documentation,
+* Retrieves the relevant CMS Local Coverage Determination (LCD),
+* Evaluates the extracted facts against documented coverage criteria using deterministic rules,
+* Invokes an LLM only when additional clinical reasoning is required,
+* Returns an Approve, Deny, or Insufficient Information recommendation,
+* Provides policy citations and an auditable reasoning trail for human review.
+
+Rather than replacing human reviewers, the system serves as a clinical decision-support assistant, allowing reviewers to validate an evidence-backed recommendation instead of manually comparing every clinical note against lengthy Medicare coverage policies.
 
 ## Why this project
 
