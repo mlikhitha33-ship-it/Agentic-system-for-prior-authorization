@@ -1,6 +1,6 @@
 # Agentic System for Medicare Coverage Eligibility Review
 
-Healthcare reviewers spend significant time manually determining whether a patient's clinical documentation satisfies Medicare coverage requirements for a requested medical service. Although CMS publishes Local Coverage Determinations (LCDs) through the Medicare Coverage Database, reviewers must still read lengthy clinical notes, identify relevant clinical facts, compare them against policy criteria, and document the rationale for their decision.
+Healthcare reviewers spend significant time manually determining whether a patient's clinical documentation satisfies Medicare coverage requirements for a requested medical service. Although CMS publishes Local Coverage Determinations (LCDs) through the Medicare Coverage Database, reviewers must read lengthy clinical notes, extract the relevant clinical information, evaluate it against Medicare coverage criteria, determine whether the requested service meets those criteria, and document the rationale for their decision.
 
 This project automates that first-pass coverage eligibility review using an agentic Retrieval-Augmented Generation (RAG) workflow. Given a clinical note and a requested procedure (starting with Lumbar MRI), the system:
 
@@ -13,17 +13,9 @@ This project automates that first-pass coverage eligibility review using an agen
 
 Rather than replacing human reviewers, the system serves as a clinical decision-support assistant, allowing reviewers to validate an evidence-backed recommendation instead of manually comparing every clinical note against lengthy Medicare coverage policies.
 
-## Why this project
+## Scope for this build: 
 
-Prior-authorization review currently requires a human reviewer to read a
-full clinical note, look up the relevant coverage policy, and manually
-cross-reference documented criteria before making a decision. This project
-automates that first pass so a reviewer can confirm the agent's reasoning
-in minutes instead of doing the full manual review — while keeping a human
-in the loop for the final accept/override decision.
-
-Scope for this build: **lumbar spine MRI requests**, evaluated against the
-real CMS Local Coverage Determination for lumbar MRI (L34220).
+**lumbar spine MRI requests**, evaluated against the real CMS Local Coverage Determination for lumbar MRI (L34220).
 
 ## Architecture
 
