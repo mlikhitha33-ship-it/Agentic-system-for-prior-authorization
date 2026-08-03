@@ -11,7 +11,9 @@ This project automates that first-pass coverage eligibility review using an agen
 * Returns an Approve, Deny, or Insufficient Information recommendation,
 * Provides policy citations and an auditable reasoning trail for human review.
 
-Rather than replacing human reviewers, the system serves as a clinical decision-support assistant, allowing reviewers to validate an evidence-backed recommendation instead of manually comparing every clinical note against lengthy Medicare coverage policies.
+## Business goal
+The system serves as a clinical decision-support assistant by Reducing the manual effort required to evaluate Medicare coverage eligibility by automating the first-pass comparison between clinical documentation and CMS coverage criteria while preserving human oversight and full decision traceability.
+
 
 ## Scope for this build: 
 
