@@ -327,8 +327,6 @@ hard to notice until retrieval quality is tested.
 
 ## Phase 5: Bridge (Node 1 to Node 2)
 
-## Phase 5: Bridge (Node 1 to Node 2)
-
 **Goal:** Automatically generate Node 2's search query from Node 1's
 extracted facts, so no one has to hand-write a query per patient.
 
