@@ -414,6 +414,11 @@ coverage pathways, resolving clear cases without any LLM call.
 
 ## Phase 7: Node 4 - LLM Judgment (conditional)
 
+**Phase 7 - Background:** Node 3 resolves most cases on its own, but
+some notes genuinely don't contain enough clearly-structured information
+for a simple yes/no check. This step exists to handle exactly those
+remaining cases, through careful reading rather than a guess.
+
 **Goal:** Resolve the specific ambiguous point Node 3 could not, using
 only the original note and the retrieved policy text - not general
 knowledge.
