@@ -137,6 +137,9 @@ correct answer, to evaluate the system against later.
    batch could be re-pulled and reviewed consistently.
 2. Manually read each sampled note and checked it against L34220's
    actual criteria.
+
+Executed the below code in the same Colab notebook against back_pain_subset.jsonlused for data fetching (Phase 1), in a new cell after the dataset had already been filtered and saved.
+
   ```python
    import pandas as pd
 import json, os
