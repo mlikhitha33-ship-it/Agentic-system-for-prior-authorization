@@ -327,6 +327,11 @@ hard to notice until retrieval quality is tested.
 
 ## Phase 5: Bridge (Node 1 to Node 2)
 
+**Phase 5 - Background:** Node 1 produces structured facts; Node 2
+expects a text question. Something needs to connect the two
+automatically, or a person would have to hand-write a search query for
+every patient.
+
 **Goal:** Automatically generate Node 2's search query from Node 1's
 extracted facts, so no one has to hand-write a query per patient.
 
