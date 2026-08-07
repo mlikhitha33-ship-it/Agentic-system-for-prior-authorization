@@ -128,8 +128,6 @@ build and test against - no synthetic/fabricated data.
 
 ## Phase 2: Ground-Truth Scenario Set
 
-## Phase 2: Ground-Truth Scenario Set
-
 **Goal:** A small set of real patient cases with a manually-determined
 correct answer, to evaluate the system against later.
 
