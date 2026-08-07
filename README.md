@@ -424,22 +424,33 @@ only the original note and the retrieved policy text - not general
 knowledge.
 
 **Steps:**
-1. Defined a second structured-output schema (`resolution`, `reasoning`,
-   `policy_citation`).
-2. Wrote a prompt providing the original note, Node 1's facts, Node 3's
-   specific unresolved question, and the retrieved policy text -
-   instructing the model to answer only from that material.
+
+1. Defined a structured-output schema for the response: `resolution`
+   (one of `criteria_met` / `criteria_not_met` / `still_insufficient`),
+   `reasoning`, and `policy_citation`.
+
+2. Built a prompt providing four inputs together, and instructing the
+   model to answer only from that material:
+
+<p align="center">
+  <img src="docs/phase7_node4_inputs.png" width="680" alt="Node 4 inputs and output">
+</p>
+
 3. Added a safety check after observing a failure mode where the API
    occasionally returned valid-but-empty JSON (`null`) rather than a
    real answer - likely tied to transient server load. The check raises
    a clear error prompting a retry instead of silently passing along an
    empty result.
-4. **Validated** on the sparse-info case: correctly returned
-   `still_insufficient`, with reasoning citing the specific missing
-   duration and conservative-treatment documentation.
 
-**Reference:** `src/node4_judgment.py`
+4. **Validated** on the sparse-info case (note idx 89665):
 
+   | Field | Result |
+   |---|---|
+   | Resolution | `still_insufficient` |
+   | Reasoning | Correctly cited the missing symptom duration and missing conservative-treatment documentation |
+   | Policy citation | Non-Red-Flag Criteria |
+
+**Implementation:** `src/node4_judgment.py`
 ---
 
 ## Phase 8: Node 5 - Final Decision
