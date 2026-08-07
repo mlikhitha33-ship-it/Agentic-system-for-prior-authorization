@@ -192,35 +192,66 @@ redesigning the format.
 section of the L34220 policy text.
 
 **Steps:**
-1. Split the policy text into 8 sections matching its actual structure
-   (Red Flag Conditions, Non-Red-Flag Criteria, Documentation
-   Requirements, etc.).
-   - **First attempt** used a regex to detect section headers written in
-     ALL CAPS. This produced only 5 chunks - the regex missed "RED FLAG
-     CONDITIONS" and "NON-RED-FLAG CRITERIA" because their titles include
-     a lowercase parenthetical explanation immediately after the caps.
-     This silently merged the Red Flag Conditions text into an adjacent
-     section.
-   - **Fix:** manually defined each section's exact boundaries in code
-     instead of relying on pattern detection, since the source document
-     is small, fixed, and fully known. This produced the correct 8
-     chunks.
-2. Embedded each chunk using Voyage AI:
-   ```python
-   result = vo.embed(chunk_texts, model="voyage-3-large", input_type="document")
-   ```
-3. Created a Pinecone index (`prior-auth-policy`) and upserted the 8
-   embedded chunks, each tagged with its section name and full text as
-   metadata.
-4. Wrote a `retrieve_policy(query, top_k)` function: embeds the query
-   (using `input_type="query"`, Voyage's separate mode for search
-   queries vs. stored documents) and returns Pinecone's closest matches.
-5. **Validated** by querying with a red-flag-style question and
-   confirming the "Red Flag Conditions" chunk was returned - this
-   surfaced the chunking bug above on the first attempt (the correct
-   chunk didn't even appear in the top 2 results), and confirmed the fix
-   after rebuilding the chunks.
 
+1. Split the L34220 text into sections. First attempt used a regex to
+   detect ALL-CAPS section headers. This produced only 5 chunks and
+   silently merged two critical sections into others, because their
+   titles contain a lowercase parenthetical immediately after the caps
+   (e.g., "RED FLAG CONDITIONS (any one of the following...)").
+
+   | Chunking attempt | Chunk count | Result |
+   |---|---|---|
+   | Regex (ALL-CAPS header detection) | 5 | "Red Flag Conditions" and "Non-Red-Flag Criteria" merged into "Coverage Indications" - not independently searchable |
+   | Manual (exact section boundaries hardcoded) | 8 | All 8 sections independently searchable, including both merged ones |
+
+   **Fix:** manually defined each section's exact text boundaries in
+   code instead of relying on pattern detection, since the source
+   document is small and fully known.
+
+2. **Executed in:** the same Colab notebook, in a new cell after the
+   policy text was loaded as a Python string.
+
+   **Code (final, correct version):**
+```python
+   chunks = [
+       {"section": "Preamble", "text": "..."},
+       {"section": "Coverage Indications, Limitations, and/or Medical Necessity", "text": "..."},
+       {"section": "Red Flag Conditions", "text": "..."},
+       {"section": "Non-Red-Flag Criteria", "text": "..."},
+       {"section": "Not Covered / Investigational Uses", "text": "..."},
+       {"section": "Duplication of Studies", "text": "..."},
+       {"section": "Documentation Requirements", "text": "..."},
+       {"section": "Utilization Guidelines", "text": "..."},
+   ]
+```
+
+3. Embedded each of the 8 chunks using Voyage AI:
+```python
+   result = vo.embed(chunk_texts, model="voyage-3-large", input_type="document")
+```
+   Produced 8 embeddings, dimension 1024.
+
+4. Created a Pinecone index and upserted the embedded chunks:
+```python
+   pc.create_index(name="prior-auth-policy", dimension=1024, metric="cosine",
+                    spec=ServerlessSpec(cloud="aws", region="us-east-1"))
+   index.upsert(vectors=vectors_to_upsert)
+```
+   Each vector's metadata includes its section name and full text, so
+   retrieval returns readable results, not just IDs.
+
+5. Wrote `retrieve_policy(query, top_k)`: embeds the query with
+   `input_type="query"` (Voyage's separate mode for search queries vs.
+   stored documents) and returns Pinecone's closest matches.
+
+6. **Validated** with the test query: *"Patient has significant motor
+   weakness and neurological deficit in the leg. Is a lumbar MRI covered
+   without conservative treatment first?"*
+
+   | Chunking version | Top result | Correct? |
+   |---|---|---|
+   | 5-chunk (buggy) | Preamble (0.663), Utilization Guidelines (0.546) | No - Red Flag Conditions did not appear in top 2 |
+   | 8-chunk (fixed) | Red Flag Conditions (0.679) | Yes |
 **Why manual chunking instead of an automated splitter:** for a small,
 fixed source document, manually verifying chunk boundaries is more
 reliable than a general-purpose splitting heuristic, and the earlier bug
