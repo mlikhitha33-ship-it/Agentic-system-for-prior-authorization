@@ -137,7 +137,7 @@ correct answer, to evaluate the system against later.
    batch could be re-pulled and reviewed consistently.
 2. Manually read each sampled note and checked it against L34220's
    actual criteria.
-
+  ```python
    import pandas as pd
 import json, os
 
@@ -150,7 +150,7 @@ for _, row in sample.iterrows():
     print(f"--- idx: {row['idx']} ---")
     print(row['full_note'][:500])
     print()
-
+```
 | Note | Disposition | Reason |
 |---|---|---|
 | idx 206186 (blurry vision, headache) | Discarded | False-positive keyword match - no back-pain complaint |
