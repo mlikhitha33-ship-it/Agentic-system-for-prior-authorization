@@ -129,7 +129,12 @@ results to.
 
 ## Phase 2: Ground-Truth Scenario Set
 
-**Goal:** A small set of real patient cases with a manually-determined
+**Background:** With real data in hand, the project needed a
+small set of cases where the correct answer was already known, so every
+later component could be checked against something concrete rather than
+just eyeballed for plausibility.
+
+**Goal:** Build a small set of real patient cases with a manually-determined
 correct answer, to evaluate the system against later.
 
 **Steps:**
