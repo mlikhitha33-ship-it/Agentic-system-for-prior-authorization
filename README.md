@@ -327,26 +327,39 @@ hard to notice until retrieval quality is tested.
 
 ## Phase 5: Bridge (Node 1 to Node 2)
 
+## Phase 5: Bridge (Node 1 to Node 2)
+
 **Goal:** Automatically generate Node 2's search query from Node 1's
 extracted facts, so no one has to hand-write a query per patient.
 
 **Steps:**
-1. Wrote a plain-code function (no LLM call) that assembles a sentence
-   from the structured facts - e.g., "Patient has a red-flag condition:
-   motor weakness. Symptom duration: 6 months."
-2. Chained it directly into `retrieve_policy()` via an
-   `extract_and_retrieve()` wrapper function.
-3. **Validated:** the auto-generated query for a red-flag case correctly
-   retrieved the Red Flag Conditions section as the top result - and
-   scored it *higher* than an earlier hand-written test query had,
-   likely because the generated query states the red flag explicitly
-   rather than more loosely.
 
-**Why plain code, not another LLM call:** this step has a clear,
-deterministic transformation (facts -> sentence) with no ambiguity to
-resolve - an LLM call here would only add latency and cost.
+1. Wrote a plain-code function (no LLM call) that assembles a search
+   query directly from the structured facts dictionary Node 1 returns -
+   translating each fact (red flag present, symptom duration,
+   conservative treatment status) into a corresponding sentence, then
+   joining them into one query string.
 
-**Reference:** included in `src/node2_retrieval.py`
+<p align="center">
+  <img src="docs/phase5_bridge_flow.png" width="600" alt="Bridge data flow">
+</p>
+
+2. Wrapped Node 1, the query builder, and Node 2's retrieval into a
+   single function so the full chain runs in one call, returning the
+   extracted facts, the generated query, and the retrieved policy
+   matches together.
+
+3. **Validated** on note idx 133792 (the red-flag case):
+
+<p align="center">
+  <img src="docs/phase5_score_comparison.png" width="480" alt="Query score comparison">
+</p>
+
+   The auto-generated query outperformed an earlier hand-written test
+   query - likely because it states the red flag explicitly rather than
+   describing symptoms more loosely.
+
+**Implementation:** `src/node2_retrieval.py`
 (`build_retrieval_query`, `extract_and_retrieve`)
 
 ---
