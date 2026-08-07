@@ -455,7 +455,9 @@ Implementation: `src/node4_judgment.py`
 
 ## Phase 8: Node 5 - Final Decision
 
-**Background:** By this point the system has determined whether coverage
+**Background:** 
+
+By this point the system has determined whether coverage
 criteria are met, either directly (Node 3) or through judgment (Node 4).
 Nothing has yet combined these into one final, single answer - that's
 this step's only job.
