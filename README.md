@@ -450,7 +450,7 @@ knowledge.
    | Reasoning | Correctly cited the missing symptom duration and missing conservative-treatment documentation |
    | Policy citation | Non-Red-Flag Criteria |
 
-**Implementation:** `src/node4_judgment.py`
+Implementation: `src/node4_judgment.py`
 ---
 
 ## Phase 8: Node 5 - Final Decision
