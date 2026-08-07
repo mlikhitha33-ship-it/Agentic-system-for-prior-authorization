@@ -128,25 +128,47 @@ build and test against - no synthetic/fabricated data.
 
 ## Phase 2: Ground-Truth Scenario Set
 
+## Phase 2: Ground-Truth Scenario Set
+
 **Goal:** A small set of real patient cases with a manually-determined
 correct answer, to evaluate the system against later.
 
 **Steps:**
-1. Sampled batches of notes from the back-pain subset and manually
-   reviewed them against L34220's actual criteria.
-2. Discarded false-positive keyword matches (e.g., notes mentioning
-   "lumbar" as an anatomical landmark rather than as a back-pain
-   complaint).
-3. Hand-labeled **5 scenarios**, each pairing: a real note, a requested
-   service, an expected decision, and the specific policy clause that
-   justifies it.
+1. Sampled candidate notes from the 3,614-note back-pain subset using
+   pandas' `.sample(n=15, random_state=42)` - a fixed seed so the same
+   batch could be re-pulled and reviewed consistently.
+2. Manually read each sampled note and checked it against L34220's
+   actual criteria.
 
-**Why do this before building the pipeline:** having ground truth
-defined up front means every later component (retrieval, rule logic,
-LLM judgment) can be checked against a known-correct answer, rather than
-just "eyeballing" whether output looks reasonable.
+| Note | Disposition | Reason |
+|---|---|---|
+| idx 206186 (blurry vision, headache) | Discarded | False-positive keyword match - no back-pain complaint |
+| idx 154031 (orbital cellulitis) | Discarded | False-positive keyword match |
+| idx 193494 (abdominal mass) | Discarded | "Lumbar" used as anatomical exam location, not a complaint |
+| idx 52554 (lipodystrophy) | Discarded | False-positive keyword match |
+| idx 93906 (dyspnea/cough) | Discarded | False-positive keyword match |
+| idx 167591 (cyclist leg injury) | Discarded | False-positive keyword match |
+| idx 153664 (shoulder) | Discarded | False-positive keyword match |
+| idx 145908 (myelopathy) | Discarded | Ambiguous - thoracic-level, not clearly "back pain" |
+| idx 49098 (bilateral numbness) | Discarded | Ambiguous - unclear presentation |
+| idx 131774, 175175, 31829, 61287 | Kept aside | Genuine hip/knee/neck cases - outside L34220's lumbar-only scope, usable if expanding to other procedures later |
+| idx 89665, 133792, 155216, 19968, 133948 | Hand-labeled | Genuine lumbar-relevant cases meeting review criteria |
 
-**Reference:** `data/processed/prior_auth_scenarios.json`
+**Hand-labeled scenarios:**
+
+| Note | Requested Service | Red Flag? | Conservative Tx Documented? | Expected Decision |
+|---|---|---|---|---|
+| 89665 | Lumbar Spine MRI | No | No | Deny |
+| 133792 | Lumbar Spine MRI | Yes (motor weakness) | Not documented | Approve |
+| 155216 | Lumbar & Cervical MRI | Yes (neuro/motor deficit) | Not documented | Approve |
+| 19968 | Lumbar Spine MRI | Yes (multiple: trauma, motor, sensory, bladder/bowel) | Not documented | Approve |
+| 133948 | Hip MRI | No | Not documented | Off-scope (no lumbar policy match) |
+
+Built a small script (`build_scenarios.py`) that stores these labeled
+scenarios as a structured list of dictionaries with a consistent schema,
+making it straightforward to add more labeled scenarios later without
+redesigning the format.
+
 
 ---
 
