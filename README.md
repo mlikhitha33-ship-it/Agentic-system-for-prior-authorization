@@ -102,8 +102,9 @@ files that might be shared or committed to version control.
 
 ## Phase 1: Data Acquisition
 
-**Goal:** Real clinical notes and a real coverage policy document to
-build and test against - no synthetic/fabricated data.
+**Phase 1 - Background:* The project needed a source of real patient narratives and a real coverage
+policy to test against - using invented data would make later validation meaningless, since there'd be nothing genuine to compare
+results to.
 
 **Steps:**
 1. **Clinical notes:** Identified `AGBonnet/augmented-clinical-notes` on
