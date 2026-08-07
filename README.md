@@ -122,18 +122,7 @@ build and test against - no synthetic/fabricated data.
 4. Saved both the full dataset and the filtered subset to Google Drive
    (`full_notes.jsonl`, `back_pain_subset.jsonl`) so they persist across
    Colab sessions.
-5. **Coverage policy:** Retrieved the real, current text of CMS Local
-   Coverage Determination **L34220** (Lumbar MRI) from the Medicare
-   Coverage Database. Saved as a clean text file.
-
-**Why real data instead of synthetic:** synthetic clinical notes and a
-made-up policy would make the project's retrieval and reasoning results
-meaningless to evaluate - there would be no ground truth to check
-against. Using the actual government policy document also makes the
-project's output auditable against a real, publicly verifiable source.
-
-**Reference:** dataset fetch logic in the Colab notebook; policy text in
-`data/policy_docs/L34220_lumbar_mri.txt`.
+5. **Coverage policy:** Retrieved the real, current text of CMS Local Coverage Determination L34220 (Lumbar MRI) from the Medicare Coverage Database (cms.gov). This document defines the specific criteria a lumbar MRI request must meet to be covered — including a list of "red-flag" conditions (e.g., major trauma, cancer history, motor weakness) that qualify a request immediately, and a separate rule for cases without a red flag requiring at least 4 weeks of documented, failed conservative treatment. Copied the relevant sections into a plain text file, preserving the original section structure (Red Flag Conditions, Non-Red-Flag Criteria, Documentation Requirements, etc.), since that structure was later used directly for chunking in Phase 3. Saved as a clean text file in `data/policy_docs/L34220_lumbar_mri.txt`.
 
 ---
 
