@@ -495,8 +495,6 @@ this step's only job.
 
 ## Phase 9: Node 6 - Audit Trail and Human Review
 
-## Phase 9: Node 6 - Audit Trail and Human Review
-
 **Background:** someone reviewing a case needs to see the
 reasoning, not just trust a black box. This step makes the reasoning
 visible and keeps a human in control of the final call.
@@ -526,10 +524,10 @@ require a human reviewer to independently confirm the final decision.
 
 4. Added a color-coded (green/red) HTML decision display for fast visual
    confirmation of the outcome, using `IPython.display.HTML`.
-
+---
 **Implementation: `src/node6_audit_trail.py`, `src/reviewer_action.py`,
 `src/decision_display.py`
----
+
 
 ## Phase 10: End-to-End Validation
 
