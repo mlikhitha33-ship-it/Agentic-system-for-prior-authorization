@@ -495,24 +495,40 @@ this step's only job.
 
 ## Phase 9: Node 6 - Audit Trail and Human Review
 
+## Phase 9: Node 6 - Audit Trail and Human Review
+
+**Background:** someone reviewing a case needs to see the
+reasoning, not just trust a black box. This step makes the reasoning
+visible and keeps a human in control of the final call.
+
 **Goal:** Present the full reasoning chain in a readable format, and
 require a human reviewer to independently confirm the final decision.
 
 **Steps:**
+
 1. Wrote a formatting function assembling every prior node's output into
-   one top-to-bottom summary: facts extracted, policy retrieved, rules
-   matched, judgment (if used), decision.
-2. Built a reviewer step using `input()`: shows the AI's recommended
-   decision and reasoning as reference, then requires the reviewer to
-   type their own decision and reason - the human's input is the final
-   record, and the system separately tracks whether it matched the AI's
-   recommendation.
-3. Added a color-coded (green/red) HTML decision display for fast visual
+   one top-to-bottom, six-section summary: facts extracted, policy
+   retrieved, rules matched, judgment (if used), decision, and a
+   reviewer-action placeholder.
+
+2. Built a reviewer step that always requires a human response,
+   regardless of what the AI recommended - not just for Deny cases. The
+   AI's recommendation is shown for reference only; the human's typed
+   decision is what becomes final.
+
+<p align="center">
+  <img src="docs/phase9_audit_review.png" width="620" alt="Audit trail and reviewer flow">
+</p>
+
+3. The system separately records whether the human's decision matched
+   the AI's recommendation (`matched_ai`), which could be used later to
+   monitor how often the AI and human reviewers agree.
+
+4. Added a color-coded (green/red) HTML decision display for fast visual
    confirmation of the outcome, using `IPython.display.HTML`.
 
-**Reference:** `src/node6_audit_trail.py`, `src/reviewer_action.py`,
+**Implementation: `src/node6_audit_trail.py`, `src/reviewer_action.py`,
 `src/decision_display.py`
-
 ---
 
 ## Phase 10: End-to-End Validation
