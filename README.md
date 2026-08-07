@@ -490,7 +490,7 @@ this step's only job.
    resolve to Deny, with the missing documentation surfaced as a
    separate `missing_information` field rather than its own category.
 
-**Implementation:** `src/node5_decision.py`
+**Implementation: `src/node5_decision.py`
 
 ---
 
