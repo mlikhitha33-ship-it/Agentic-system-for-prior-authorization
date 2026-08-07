@@ -185,8 +185,71 @@ redesigning the format.
 
 
 ---
+## Phase 3: Node 1 - Structured Fact Extraction
 
-## Phase 3: Node 2 - Policy Retrieval
+**Goal:** Convert a raw clinical note into a fixed set of structured
+facts needed to evaluate coverage criteria.
+
+**Steps:**
+
+1. Defined a JSON schema listing exactly which fields to extract:
+
+   | Field | Type | Notes |
+   |---|---|---|
+   | `age` | integer, nullable | Null if not stated |
+   | `symptom_duration` | string, nullable | As stated in the note (e.g. "6 months") |
+   | `conservative_treatment_documented` | boolean, nullable | True/False/Null - null means not mentioned either way |
+   | `neurological_deficit` | boolean | Required field |
+   | `neurological_deficit_detail` | string, nullable | Brief description if present |
+   | `red_flags_present` | boolean | Required field |
+   | `red_flag_type` | string, nullable | Which red flag(s), if any |
+   | `requested_service` | string | Required field |
+
+2. **Model used:** the reasoning/extraction model changed twice before
+   settling:
+
+   | Stage | Model | Reason for change |
+   |---|---|---|
+   | Original plan | OpenAI | Initial project scope |
+   | First switch | Claude Sonnet | Reconsidered vendor choice |
+   | Final | Gemini (`gemini-3.6-flash`) | Two-vendor stack (Gemini + Voyage AI) instead of three separate providers |
+
+3. Built the extraction function using Gemini's schema-constrained
+   structured output, so the response is always valid JSON in the exact
+   shape above:
+```python
+   def extract_facts(clinical_note, requested_service):
+       prompt = (
+           f"Requested service: {requested_service}\n\n"
+           f"Clinical note:\n{clinical_note}\n\n"
+           "Extract the structured clinical facts from this note. Only use "
+           "information actually stated or clearly implied in the note - do "
+           "not guess or infer beyond what's written."
+       )
+       response = client.models.generate_content(
+           model="gemini-3.6-flash",
+           contents=prompt,
+           config=types.GenerateContentConfig(
+               response_mime_type="application/json",
+               response_schema=extraction_schema
+           )
+       )
+       return json.loads(response.text)
+```
+
+4. **Validated** against the 5 labeled scenarios from Phase 2:
+
+   | Note | Age extracted | Duration extracted | Red flag detected | Correct? |
+   |---|---|---|---|---|
+   | 89665 | 47 | null (correctly - not stated) | No | Yes |
+   | 133792 | 70 | 6 months | Yes - motor weakness | Yes |
+   | 155216 | 16 | null | Yes - neuro/motor deficit | Yes |
+   | 19968 | 46 | 2 hours | Yes - major trauma, motor, sensory, bladder/bowel | Yes |
+   | 133948 | 36 | 2 months | No | Yes |
+
+   Fields the note didn't mention were correctly returned as `null`
+   rather than guessed.
+## Phase 4: Node 2 - Policy Retrieval
 
 **Goal:** Given a natural-language question, retrieve the correct
 section of the L34220 policy text.
@@ -259,44 +322,6 @@ demonstrated exactly how a heuristic can silently fail in a way that's
 hard to notice until retrieval quality is tested.
 
 **Reference:** `src/node2_retrieval.py`
-
----
-
-## Phase 4: Node 1 - Structured Fact Extraction
-
-**Goal:** Convert a raw clinical note into a fixed set of structured
-facts needed to evaluate coverage criteria.
-
-**Steps:**
-1. Defined a JSON schema listing exactly which fields to extract: age,
-   symptom duration, conservative treatment (bool/null), neurological
-   deficit, red flags, requested service.
-2. Wrote an extraction function using Gemini's schema-constrained
-   structured output, so the model's response is always valid JSON in
-   this exact shape:
-   ```python
-   response = client.models.generate_content(
-       model="gemini-3.6-flash",
-       contents=prompt,
-       config=types.GenerateContentConfig(
-           response_mime_type="application/json",
-           response_schema=extraction_schema
-       )
-   )
-   ```
-3. The prompt explicitly instructs the model not to guess or infer
-   information beyond what the note states.
-4. **Validated** against all 5 labeled scenarios - extraction correctly
-   pulled out age, duration, and red-flag details in every case, and
-   correctly returned `null` for fields the note didn't mention (e.g.,
-   conservative treatment history), rather than fabricating an answer.
-
-**Model changes during development:** the reasoning/extraction model was
-originally planned as OpenAI, briefly switched to Claude Sonnet, and
-finally set on **Gemini** (`gemini-3.6-flash`) to keep a two-vendor stack
-(Gemini + Voyage AI) instead of three separate providers.
-
-**Reference:** `src/node1_extraction.py`
 
 ---
 
