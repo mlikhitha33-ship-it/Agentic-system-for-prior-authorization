@@ -138,6 +138,19 @@ correct answer, to evaluate the system against later.
 2. Manually read each sampled note and checked it against L34220's
    actual criteria.
 
+   import pandas as pd
+import json, os
+
+subset_path = os.path.join(DRIVE_FOLDER, "back_pain_subset.jsonl")
+relevant = pd.read_json(subset_path, lines=True)
+
+sample = relevant.sample(n=15, random_state=42)
+
+for _, row in sample.iterrows():
+    print(f"--- idx: {row['idx']} ---")
+    print(row['full_note'][:500])
+    print()
+
 | Note | Disposition | Reason |
 |---|---|---|
 | idx 206186 (blurry vision, headache) | Discarded | False-positive keyword match - no back-pain complaint |
