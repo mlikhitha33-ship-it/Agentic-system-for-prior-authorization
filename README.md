@@ -364,24 +364,45 @@ extracted facts, so no one has to hand-write a query per patient.
 
 ## Phase 6: Node 3 - Rule-Based Criteria Match
 
+**Background:** By this point, Node 1 has read the clinical note and
+produced a clean list of facts, and Node 2 has retrieved the relevant
+policy text. But nothing has actually *compared* the two yet - the
+system knows the facts, and it knows the rule, but hasn't checked
+whether the facts satisfy the rule. That comparison is a straightforward
+yes/no lookup for most cases (e.g., "is red_flags_present true?"), which
+doesn't require an AI model to answer - it just requires checking a
+value against a condition, the same way a spreadsheet formula would.
+Node 3 does that comparison directly in code, reserving the more
+expensive, slower LLM call (Node 4) only for the cases where the facts
+alone genuinely aren't enough to decide.
+
 **Goal:** Check the extracted facts directly against L34220's two
 coverage pathways, resolving clear cases without any LLM call.
 
 **Steps:**
+
 1. Implemented the **red-flag pathway** check: a direct read of
-   `red_flags_present` from Node 1's output.
+   `red_flags_present` from Node 1's output. If true, the case is
+   resolved immediately - no further checks needed.
+
 2. Implemented the **non-red-flag pathway** check: requires both (a)
    symptom duration >= 4 weeks and (b) documented conservative treatment.
-3. Wrote a duration parser converting free-text durations ("6 months",
+   Wrote a duration parser converting free-text durations ("6 months",
    "2 weeks") into a comparable number of weeks.
-4. Designed the function so that if either required value can't be
-   determined (unparseable duration, or conservative treatment not
-   documented either way), the case is flagged `needs_llm_judgment: True`
-   with a specific reason - rather than defaulting to an assumption.
-5. **Validated** against two known cases: a red-flag case resolved
-   entirely by this step alone (no judgment needed), and a sparse-info
-   case correctly flagged for further judgment.
 
+3. If either required value can't be determined (unparseable duration,
+   or conservative treatment not documented either way), the case is
+   flagged `needs_llm_judgment: True` with a specific reason - rather
+   than defaulting to an assumption
+
+4. **Validated** against two known cases:
+
+   | Note | Red flag? | Duration | Conservative tx | Result |
+   |---|---|---|---|---|
+   | 133792 | Yes (motor weakness) | 6 months | Not documented | `red_flag_pathway: MET` - resolved without needing Node 4, even though the non-red-flag pathway alone was ambiguous |
+   | 89665 | No | Not stated | Not documented | `needs_llm_judgment: True` - correctly flagged rather than guessed |
+
+   
 **Reference:** `src/node3_rules.py`
 
 ---
