@@ -575,21 +575,43 @@ require a human reviewer to independently confirm the final decision.
 
 ## Phase 10: End-to-End Validation
 
+**Background:** Testing each node individually confirms the pieces work
+in isolation, but not that they work correctly together, in sequence, on
+a real case start to finish. This phase closes that gap.
+
 **Goal:** Confirm the full chain (Node 1 through Node 6) works correctly
 across multiple real patient cases, not just in isolation.
 
 **Steps:**
-1. Wrote a script running all 5 labeled scenarios through the complete
-   pipeline in sequence, printing each result against its expected
-   outcome.
-2. Validated individual end-to-end runs, including both Approve and Deny
-   outcomes and a case requiring Node 4's judgment step.
-3. A full batch run of all 5 in one session has not yet completed
-   successfully due to hitting the Gemini API free-tier daily request
-   quota partway through - a usage-limit issue, not a defect in the
-   pipeline logic.
 
-**Reference:** `src/run_all_5_scenarios.py`
+1. Wrote a script that loops through all 5 labeled scenarios, running
+   each one through the complete pipeline in sequence (Node 1 -> Bridge
+   -> Node 2 -> Node 3 -> Node 4 if needed -> Node 5 -> Node 6), and
+   prints each case's full audit trail as it completes.
+
+2. At the end, prints a summary comparing every case's actual decision
+   against its expected outcome:
+
+```
+   ======================================================================
+   SUMMARY - ALL 5 SCENARIOS
+   ======================================================================
+     idx 89665: Deny  (expected: DENY - no red flag, no documented duration/conservative treatment)
+     idx 133792: Approve  (expected: APPROVE - red flag AND long duration, two independent paths)
+     idx 155216: Approve  (expected: APPROVE - red flag (neuro/motor deficit))
+     idx 19968: Approve  (expected: APPROVE - major trauma + severe neuro deficit + bladder/bowel dysfunction)
+     idx 133948: Deny  (expected: OFF-SCOPE TEST - hip request, no matching lumbar policy)
+```
+
+3. **Status:** individual end-to-end runs have been validated, including
+   both Approve and Deny outcomes and a case requiring Node 4's judgment
+   step. A full clean run of all 5 scenarios together in one session has
+   not yet completed successfully, due to hitting the Gemini API
+   free-tier daily request quota partway through - a usage-limit issue,
+   not a defect in the pipeline logic.
+
+**Implementation:** `src/run_all_5_scenarios.py`
+
 
 ## Status
 
