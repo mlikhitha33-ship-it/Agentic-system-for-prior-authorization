@@ -102,7 +102,7 @@ files that might be shared or committed to version control.
 
 ## Phase 1: Data Acquisition
 
-**Background:* The project needed a source of real patient narratives and a real coverage
+**Background:** The project needed a source of real patient narratives and a real coverage
 policy to test against - using invented data would make later validation meaningless, since there'd be nothing genuine to compare
 results to.
 
