@@ -455,20 +455,36 @@ Implementation: `src/node4_judgment.py`
 
 ## Phase 8: Node 5 - Final Decision
 
+**Background:** By this point the system has determined whether coverage
+criteria are met, either directly (Node 3) or through judgment (Node 4).
+Nothing has yet combined these into one final, single answer - that's
+this step's only job.
+
 **Goal:** Combine Node 3 and Node 4's outputs into one final decision.
 
 **Steps:**
-1. Wrote plain combination logic (no LLM call): red-flag pathway met ->
-   Approve; non-red-flag pathway clearly met/not met -> Approve/Deny;
-   Node 4's judgment (if it ran) maps to Approve/Deny.
+
+1. Wrote plain combination logic (no LLM call) mapping the two inputs
+   to a final Approve or Deny outcome:
+
+   | Node 3: Red-flag pathway | Node 3: Non-red-flag pathway | Node 4 ran? | Node 4 resolution | Final Decision |
+   |---|---|---|---|---|
+   | Met | (irrelevant) | No | - | **Approve** |
+   | Not met | Met | No | - | **Approve** |
+   | Not met | Not met | No | - | **Deny** |
+   | Not met | Undetermined | No | - | **Deny** (+ `missing_information`) |
+   | Not met | Undetermined | Yes | `criteria_met` | **Approve** |
+   | Not met | Undetermined | Yes | `criteria_not_met` | **Deny** |
+   | Not met | Undetermined | Yes | `still_insufficient` | **Deny** (+ `missing_information`) |
+
 2. **Decision model changed during development:** initially a three-way
    outcome (Approve / Deny / Insufficient Information), matching the
    original project scope. Later collapsed to **two-way (Approve /
    Deny)** - cases that would have been "Insufficient Information" now
    resolve to Deny, with the missing documentation surfaced as a
-   separate `missing_information` field.
+   separate `missing_information` field rather than its own category.
 
-**Reference:** `src/node5_decision.py`
+**Implementation:** `src/node5_decision.py`
 
 ---
 
