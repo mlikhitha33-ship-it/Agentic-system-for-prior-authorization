@@ -495,8 +495,6 @@ this step's only job.
 
 ## Phase 9: Node 6 - Audit Trail and Human Review
 
-## Phase 9: Node 6 - Audit Trail and Human Review
-
 **Background:** A correct decision buried inside code isn't usable in a
 real review workflow - someone reviewing a case needs to see the
 reasoning, not just trust a black box. This step makes the reasoning
