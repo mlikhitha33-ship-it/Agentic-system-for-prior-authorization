@@ -469,6 +469,10 @@ this step's only job.
 1. Wrote plain combination logic (no LLM call) mapping the two inputs
    to a final Approve or Deny outcome:
 
+<p align="center">
+  <img src="docs/phase8_decision_combination.png" width="700" alt="Node 5 decision combination logic">
+</p>
+
    | Node 3: Red-flag pathway | Node 3: Non-red-flag pathway | Node 4 ran? | Node 4 resolution | Final Decision |
    |---|---|---|---|---|
    | Met | (irrelevant) | No | - | **Approve** |
@@ -479,7 +483,7 @@ this step's only job.
    | Not met | Undetermined | Yes | `criteria_not_met` | **Deny** |
    | Not met | Undetermined | Yes | `still_insufficient` | **Deny** (+ `missing_information`) |
 
-2. **Decision model changed during development:** initially a three-way
+3. **Decision model changed during development:** initially a three-way
    outcome (Approve / Deny / Insufficient Information), matching the
    original project scope. Later collapsed to **two-way (Approve /
    Deny)** - cases that would have been "Insufficient Information" now
