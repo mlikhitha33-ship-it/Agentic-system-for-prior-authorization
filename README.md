@@ -495,7 +495,10 @@ this step's only job.
 
 ## Phase 9: Node 6 - Audit Trail and Human Review
 
-**Background:** someone reviewing a case needs to see the
+## Phase 9: Node 6 - Audit Trail and Human Review
+
+**Background:** A correct decision buried inside code isn't usable in a
+real review workflow - someone reviewing a case needs to see the
 reasoning, not just trust a black box. This step makes the reasoning
 visible and keeps a human in control of the final call.
 
@@ -505,18 +508,62 @@ require a human reviewer to independently confirm the final decision.
 **Steps:**
 
 1. Wrote a formatting function assembling every prior node's output into
-   one top-to-bottom, six-section summary: facts extracted, policy
-   retrieved, rules matched, judgment (if used), decision, and a
-   reviewer-action placeholder.
+   one top-to-bottom, six-section summary. Sample output for note idx
+   89665:
+
+```
+   ======================================================================
+   PRIOR-AUTHORIZATION REVIEW - AUDIT TRAIL
+   ======================================================================
+
+   REQUESTED SERVICE: Lumbar Spine MRI without contrast
+
+   [1] FACTS EXTRACTED FROM CLINICAL NOTE
+   ----------------------------------------------------------------------
+     age: 47
+     symptom_duration: None
+     conservative_treatment_documented: None
+     neurological_deficit: False
+     red_flags_present: False
+     requested_service: Lumbar Spine MRI without contrast
+
+   [2] POLICY RETRIEVED
+   ----------------------------------------------------------------------
+     Search query used: "no red flag conditions, conservative treatment history"
+     - [0.619] Non-Red-Flag Criteria
+     - [0.604] Red Flag Conditions
+
+   [3] RULES MATCHED / UNMATCHED
+   ----------------------------------------------------------------------
+     Red-flag pathway: not_met
+     Non-red-flag pathway: undetermined
+     -> Flagged for further judgment: Could not parse symptom_duration ('None') into weeks.
+
+   [4] LLM JUDGMENT (ambiguous case resolution)
+   ----------------------------------------------------------------------
+     Resolution: still_insufficient
+     Reasoning: The clinical note describes 'acute onset' lower back pain,
+     but does not provide the specific duration of symptoms or document a
+     4-week trial of conservative management.
+     Cited policy section: Non-Red-Flag Criteria
+
+   [5] DECISION
+   ----------------------------------------------------------------------
+     DECISION: Deny
+     Reasoning: Unable to confirm criteria are met.
+     Missing information: Could not parse symptom_duration ('None') into weeks.
+     Resolved by: Node 3 + Node 4 (LLM judgment)
+
+   [6] REVIEWER ACTION
+   ----------------------------------------------------------------------
+     [ ] Accept    [ ] Override
+   ======================================================================
+```
 
 2. Built a reviewer step that always requires a human response,
    regardless of what the AI recommended - not just for Deny cases. The
    AI's recommendation is shown for reference only; the human's typed
    decision is what becomes final.
-
-<p align="center">
-  <img src="docs/phase9_audit_review.png" width="620" alt="Audit trail and reviewer flow">
-</p>
 
 3. The system separately records whether the human's decision matched
    the AI's recommendation (`matched_ai`), which could be used later to
@@ -524,10 +571,9 @@ require a human reviewer to independently confirm the final decision.
 
 4. Added a color-coded (green/red) HTML decision display for fast visual
    confirmation of the outcome, using `IPython.display.HTML`.
----
-**Implementation: `src/node6_audit_trail.py`, `src/reviewer_action.py`,
-`src/decision_display.py`
 
+**Implementation:** `src/node6_audit_trail.py`, `src/reviewer_action.py`,
+`src/decision_display.py`
 
 ## Phase 10: End-to-End Validation
 
